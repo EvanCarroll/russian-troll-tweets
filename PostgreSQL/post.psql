@@ -11,7 +11,23 @@
 CREATE INDEX ON rustweets.tweets (author);
 CREATE INDEX ON rustweets.tweets (publish_date);
 
-CREATE STATISTICS rustweets (dependencies) ON tweet_id, publish_date FROM rustweets.tweets;
+-- Because this file is denormalized we have functional dependencies
+-- this informs the query planner
+CREATE STATISTICS rustweets_tweets (dependencies)
+	ON tweet_id, publish_date
+	FROM rustweets.tweets;
+CREATE STATISTICS rustweets_author (dependencies)
+	ON author, account_type, account_category
+	FROM rustweets.tweets;
+
+CREATE TABLE rustweets.accounts (
+	account_name     text PRIMARY KEY,
+	account_type     text,
+	account_category text
+);
+INSERT INTO rustweets.accounts(account_name, account_type, account_category)
+	SELECT DISTINCT author, account_type, account_category
+	FROM rustweets.tweets ;
 
 CLUSTER rustweets.tweets USING tweets_pkey;
 VACUUM ANALYZE rustweets.tweets;

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-psql -e -d test -c "\\COPY (TABLE rustweets.tweets ORDER BY tweet_id) TO 'dump.csv' WITH ( HEADER true, FORMAT csv );"
+psql -e -d test -c "SET TIME ZONE ust; \\COPY (TABLE rustweets.tweets ORDER BY tweet_id) TO 'dump.csv' WITH ( HEADER true, FORMAT csv );"
 
 split --verbose -C 100MB --numeric-suffixes --additional-suffix=.csv ./dump.csv rustweets_
 rm -v dump.csv;
